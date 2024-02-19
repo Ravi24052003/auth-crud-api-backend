@@ -69,6 +69,7 @@ exports.createProduct = async (req, res)=>{
         const product = products?.find((ele)=>ele._id == req.params.id);
 
         if(product){
+          const getProduct = await Product.findById(req.params.id);
           const obj = {};
           let title = String(req.body?.title);
           let description = String(req.body?.description);
@@ -93,9 +94,15 @@ exports.createProduct = async (req, res)=>{
             obj.stockError = "Stock can't be less than 1"
           }
 
-          if(req.body?.stock && typeof req.body?.stock !== 'string'){
+          if(req.body?.stock < getProduct.stock && req.body?.stock < 10){
+            obj.stockError = "The stock value should be greater than the previous value or 9"
+
+            console.log("The stock value should be greater than the previous value or 10", "previous value ->" ,getProduct.stock, "new Value", req.body.stock);
+          }
+
+          if(req.body?.stock){
             if(Math.floor(Number(req.body?.stock)) !== Number(req.body?.stock)){
-              obj.stockError = "Stock should be a positve integer greater than 1"
+              obj.stockError = "Stock should be a positve integer greater than 9 or previous value"
              }
           }
           
